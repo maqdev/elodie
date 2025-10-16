@@ -120,7 +120,7 @@ def get_prefer_english_names():
     if __PREFER_ENGLISH_NAMES__ is not None:
         return __PREFER_ENGLISH_NAMES__
 
-    config_file = '%s/config.ini' % constants.application_directory
+    config_file = '%s/config.ini' % constants.application_directory()
     if not path.exists(config_file):
         return False
 
@@ -231,6 +231,16 @@ def parse_result(result):
     if( 'info' not in result or
         'statuscode' not in result['info'] or
         result['info']['statuscode'] != 0
+       ):
+        return None
+
+    if( 'results' in result and
+        len(result['results']) > 0 and
+        'locations' in result['results'][0] and
+        len(result['results'][0]['locations']) > 0 and
+        # Return None if source is FALLBACK (invalid location)
+        'source' in result['results'][0]['locations'][0] and
+        result['results'][0]['locations'][0]['source'] == 'FALLBACK'
        ):
         return None
 
